@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import Login, { validateEmail } from "../Login"
+import userEvent from "@testing-library/user-event";
 
 describe("Test Login Component", () => {
   // 로그인 버튼이 하나만 있는지 테스트
@@ -26,5 +27,22 @@ describe("Test Login Component", () => {
     render(<Login />);
     const password = screen.getByPlaceholderText("비밀번호 입력");
     expect(password).toHaveAttribute('type', 'password');
+  })
+
+  // submit 테스트
+  test('should be able to submit the form', async () => {
+    render(<Login />);
+    const submitButton = screen.getByTestId("submit");
+    const email = screen.getByPlaceholderText("이메일 입력");
+    const password = screen.getByPlaceholderText("비밀번호 입력");
+
+    userEvent.type(email, "test@email.com");
+    userEvent.type(password, "password");
+    userEvent.click(submitButton);
+    
+    await waitFor(() => {
+      const userInfo = screen.getByText("test@email.com");
+      expect(userInfo).toBeInTheDocument();
+    });
   })
 })
